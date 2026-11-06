@@ -1,0 +1,16 @@
+[
+  {
+    "id": "X1",
+    "company_or_scope": "test",
+    "signal_type": "pay_equity_settlement",
+    "observed_fact": "fact",
+    "inference": "inf",
+    "unknown": "none",
+    "source_url": "",
+    "source_name": "LegalClarity court order",
+    "source_published_date": "2026",
+    "accessed_date": "2026-11-06",
+    "event_date": "2026-06-11",
+    "quarantine_reason": "SOURCE_MISSING"
+  }
+]

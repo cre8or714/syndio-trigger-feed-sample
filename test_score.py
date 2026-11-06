@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""Minimal real tests. Run: python3 test_score.py"""
-from score import score_trigger, RULE_VERSION
+"""Real tests across the ICM stages. Run: python3 test_score.py"""
+import sys
+from pathlib import Path
 
-passed = 0
-failed = 0
+ROOT = Path(__file__).parent
+sys.path.insert(0, str(ROOT / "stages" / "02-validate"))
+sys.path.insert(0, str(ROOT / "stages" / "03-score"))
+from validate import run as validate_run  # noqa: E402
+from score import score_one, RULE_VERSION  # noqa: E402
+
+passed = failed = 0
 
 
 def check(name, condition):
@@ -16,7 +22,6 @@ def check(name, condition):
         print(f"FAIL  {name}")
 
 
-# Test 1: a real entry is never quarantined
 real_entry = {
     "id": "X1", "company_or_scope": "test", "signal_type": "pay_equity_settlement",
     "observed_fact": "fact", "inference": "inf", "unknown": "none",
@@ -24,27 +29,30 @@ real_entry = {
     "source_name": "LegalClarity court order", "source_published_date": "2026",
     "accessed_date": "2026-11-06", "event_date": "2026-06-11",
 }
-r1 = score_trigger(real_entry)
-check("entry with a source URL is not quarantined", r1["quarantined"] is False)
 
-# Test 2: an entry with no source URL is quarantined, no matter the score
+# Stage 02 (validate): the quarantine gate itself
+valid, quarantined = validate_run([real_entry])
+check("entry with a source URL passes validation", len(valid) == 1 and len(quarantined) == 0)
+
 bad_entry = dict(real_entry)
 bad_entry["source_url"] = ""
-r2 = score_trigger(bad_entry)
-check("entry with no source URL is quarantined", r2["quarantined"] is True)
-check("quarantine holds even though subscores still computed high",
-      r2["total_score"] >= 80 and r2["quarantined"] is True)
+valid2, quarantined2 = validate_run([bad_entry])
+check("entry with no source URL is quarantined before scoring ever runs",
+      len(valid2) == 0 and len(quarantined2) == 1
+      and quarantined2[0]["quarantine_reason"] == "SOURCE_MISSING")
 
-# Test 3: determinism, same input twice gives the identical result
-r3a = score_trigger(real_entry)
-r3b = score_trigger(real_entry)
-check("same input produces identical score (determinism)", r3a == r3b)
+# Stage 03 (score): determinism and honest freshness handling,
+# only ever called on records that already passed stage 02
+r1 = score_one(real_entry)
+check("scoring a validated entry never re-quarantines it", r1["quarantined"] is False)
 
-# Test 4: unknown event date scores 0 freshness instead of being guessed
+r1b = score_one(real_entry)
+check("same input produces identical score (determinism)", r1 == r1b)
+
 unknown_date_entry = dict(real_entry)
 unknown_date_entry["event_date"] = "unknown, not stated"
-r4 = score_trigger(unknown_date_entry)
-check("unknown event date scores 0 freshness, not guessed", r4["subscores"]["freshness"] == 0)
+r2 = score_one(unknown_date_entry)
+check("unknown event date scores 0 freshness, not guessed", r2["subscores"]["freshness"] == 0)
 
 print(f"\n{passed} passed, {failed} failed. Rule version under test: {RULE_VERSION}")
-exit(1 if failed else 0)
+sys.exit(1 if failed else 0)
