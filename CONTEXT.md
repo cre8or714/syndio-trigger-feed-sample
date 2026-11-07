@@ -7,10 +7,10 @@ framework, no hidden state.
 
 ## Stage map
 
-1. `stages/01-collect` — the 5 real sourced triggers, nothing else
-2. `stages/02-validate` — source/evidence gate, quarantines anything unverifiable
-3. `stages/03-score` — the fixed deterministic scoring rule
-4. `stages/04-review` — human-readable output, the only thing a person reads
+1. `stages/01-collect`, the 5 real sourced triggers, nothing else
+2. `stages/02-validate`, source/evidence gate, quarantines anything unverifiable
+3. `stages/03-score`, the fixed deterministic scoring rule
+4. `stages/04-review`, human-readable output, the only thing a person reads
 
 ## How to run it
 

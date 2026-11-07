@@ -13,7 +13,7 @@ def build_review(scored: list[dict], quarantined: list[dict]) -> str:
     lines = ["# Trigger feed review\n"]
     for r in scored:
         s = r["subscores"]
-        lines.append(f"## [{r['id']}] {r['company_or_scope']} — {r['total_score']}/100\n")
+        lines.append(f"## [{r['id']}] {r['company_or_scope']}, {r['total_score']}/100\n")
         lines.append(f"- icp_fit={s['icp_fit']}  signal={s['signal_strength']}  "
                       f"evidence={s['evidence_strength']} ({s['evidence_tier']})  "
                       f"freshness={s['freshness']} ({s['freshness_note']})  "

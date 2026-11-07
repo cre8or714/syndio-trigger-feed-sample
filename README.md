@@ -19,12 +19,12 @@ team would use.
 
 ## Stages
 
-1. `stages/01-collect` — the 5 sourced signals, nothing computed
-2. `stages/02-validate` — source gate, quarantines anything unverifiable
+1. `stages/01-collect`, the 5 sourced signals, nothing computed
+2. `stages/02-validate`, source gate, quarantines anything unverifiable
    before scoring ever sees it
-3. `stages/03-score` — the fixed four-part rule: ICP fit, signal
+3. `stages/03-score`, the fixed four-part rule: ICP fit, signal
    strength, evidence strength, freshness, buyer path clarity
-4. `stages/04-review` — the one human-readable output, `review.md`
+4. `stages/04-review`, the one human-readable output, `review.md`
 
 Each stage has its own `CONTEXT.md` with Inputs, Process, Outputs,
 Checkpoint, Audit. Open any of them directly, no code required, to
